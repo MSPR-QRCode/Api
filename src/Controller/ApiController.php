@@ -34,7 +34,7 @@ class ApiController extends AbstractController
 
     /**
      * @Route("/api/qrcode", name="api_qrcode_error")
-     * @Route("/api/qrcode?{idQrCode}", name="api_qrcode")
+     * @Route("/api/qrcode?{idQrCode}", name="api_scan_qrcode")
      */
     public function GetQrCode(Request $request, SerializerInterface $serializer) : Response
     {
@@ -152,13 +152,13 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("api/my-qrcodes", name="api_mesqrcode")
+     * @Route("/api/my-qrcodes", name="api_myqrcodes")
      */
     public function GetMyQrCodes(Request $request, SerializerInterface $serializer) : Response
     {
 
         if ($request->isMethod('get')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method GET is not allowed for api/mes-qrcodes");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method GET is not allowed for api/my-qrcodes");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -169,7 +169,7 @@ class ApiController extends AbstractController
         }
 
         else if ($request->isMethod('put')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method PUT is not allowed for api/mes-qrcodes");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method PUT is not allowed for api/my-qrcodes");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -180,7 +180,7 @@ class ApiController extends AbstractController
         }
 
         else if ($request->isMethod('delete')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method DELETE is not allowed for api/mes-qrcodes");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method DELETE is not allowed for api/my-qrcodes");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -287,12 +287,13 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("api/promotions", name="api_list_qrcode")
+     * @Route("/api/promotions", name="api_promotions_qrcode")
      */
     public function GetPromotions(Request $request, SerializerInterface $serializer) : Response
     {
+
         if ($request->isMethod('get')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method GET is not allowed for api/les-promotions");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method GET is not allowed for api/promotions");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -303,7 +304,7 @@ class ApiController extends AbstractController
         }
 
         else if ($request->isMethod('put')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method PUT is not allowed for api/les-promotions");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method PUT is not allowed for api/promotions");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -314,7 +315,7 @@ class ApiController extends AbstractController
         }
 
         else if ($request->isMethod('delete')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method DELETE is not allowed for api/les-promotions");
+            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method DELETE is not allowed for api/promotions");
 
             $json = json_encode($error_405);
             $response = new Response($json, 405,
@@ -413,78 +414,71 @@ class ApiController extends AbstractController
                 ]);
             return $response;
         }
-
+        $date = new \DateTime('now');
+        $timestamp = $date->getTimestamp();
         try {
-
+            $myIdQrCode = $requestBody['MyIdQRCodes'];
             try {
-                $myIdQrCode = $requestBody['MyIdQRCodes'];
-                $date = new \DateTime('now');
-                $timestamp = $date->getTimestamp();
-
-                $query = "SELECT id,id_qrcode AS idQRCode,name,description,image,date_crea AS dateCrea,date_exp AS dateExp,code_promo AS codePromo FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
-                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
-                $connection->execute();
-                $allPromotions = $connection->fetchAll();
-                $sizeAllPromos = sizeof($allPromotions);
-
-                $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
-                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
-                $connection->execute();
-                $nbOfQrCode = $connection->fetchAll();
-
-                for($i=0;$i<$sizeAllPromos;$i++)
-                {
-                    if(!in_array($allPromotions[$i]["idQRCode"],$myIdQrCode))
-                    {
-                        unset($allPromotions[$i]["idQRCode"]);
-                        unset($allPromotions[$i]["codePromo"]);
-                    }
-                }
-                /*if(in_array($allPromotions[1]["idQRCode"],$myIdQrCode))
-                {
-                    unset($allPromotions[1]["idQRCode"]);
-                }*/
-
-
-                $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
-                $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
-
-                $response = new Response($jsonContent, 200,
-                    ["Content-Type" => "application/json"
-
-                    ]);
-
-                return $response;
-
-        }
-        catch(\Exception $exception)
-            {
-                $date = new \DateTime('now');
-                $timestamp = $date->getTimestamp();
-
-                $query = "SELECT id,name,description,image,date_crea AS dateCrea,date_exp AS dateExp FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
-                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
-                $connection->execute();
-                $allPromotions = $connection->fetchAll();
-
-                $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
-                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
-                $connection->execute();
-                $nbOfQrCode = $connection->fetchAll();
-
-                $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
-                $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
-
-                $response = new Response($jsonContent, 200,
-                    ["Content-Type" => "application/json"
-
-                    ]);
-
-                return $response;
+                $name = $requestBody['searchName'];
+                $query = "SELECT id,id_qrcode AS idQRCode,name,description,image,date_crea AS dateCrea,date_exp AS dateExp,code_promo AS codePromo FROM qr_code WHERE date_exp > $timestamp AND name LIKE '$name%' LIMIT $firstId , $numberOfQrCode";
             }
 
+            catch (\Exception $exception)
+            {
+                $query = "SELECT id,id_qrcode AS idQRCode,name,description,image,date_crea AS dateCrea,date_exp AS dateExp,code_promo AS codePromo FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
+            }
 
+            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
+            $connection->execute();
+            $allPromotions = $connection->fetchAll();
+            $sizeAllPromos = sizeof($allPromotions);
 
+            $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
+            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
+            $connection->execute();
+            $nbOfQrCode = $connection->fetchAll();
+
+            for($i=0;$i<$sizeAllPromos;$i++)
+            {
+                if(!in_array($allPromotions[$i]["idQRCode"],$myIdQrCode))
+                {
+                    unset($allPromotions[$i]["idQRCode"]);
+                    unset($allPromotions[$i]["codePromo"]);
+                }
+            }
+
+            $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
+            $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
+
+            $response = new Response($jsonContent, 200,
+                ["Content-Type" => "application/json"
+
+                ]);
+
+            return $response;
+        }
+
+        catch (\Exception $exception)
+        {
+            $query = "SELECT id,name,description,image,date_crea AS dateCrea,date_exp AS dateExp FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
+            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
+            $connection->execute();
+            $allPromotions = $connection->fetchAll();
+
+            $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
+            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
+            $connection->execute();
+            $nbOfQrCode = $connection->fetchAll();
+
+            $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
+            $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
+
+            $response = new Response($jsonContent, 200,
+                ["Content-Type" => "application/json"
+
+                ]);
+
+            return $response;
 
         }
 
@@ -499,10 +493,9 @@ class ApiController extends AbstractController
                 ]);
             return $response;
         }
-
-
-
+        
     }
+
 
     /**
      * @Route("/api/create-qrcode/{test}", name="api_create_qrcode")
