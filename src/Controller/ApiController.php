@@ -464,7 +464,7 @@ class ApiController extends AbstractController
         {
             try {
                 $name = $requestBody['searchName'];
-                $query = "SELECT id,id_qrcode AS idQRCode,name,description,image,date_crea AS dateCrea,date_exp AS dateExp,code_promo AS codePromo FROM qr_code WHERE date_exp > $timestamp AND name LIKE '$name%' LIMIT $firstId , $numberOfQrCode";
+                $query = "SELECT id,name,description,image,date_crea AS dateCrea,date_exp AS dateExp FROM qr_code WHERE date_exp > $timestamp AND name LIKE '$name%' LIMIT $firstId , $numberOfQrCode";
                 $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp AND name LIKE '$name%'";
             }
 
