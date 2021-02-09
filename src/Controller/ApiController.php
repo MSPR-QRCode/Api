@@ -152,7 +152,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("api/mes-qrcodes", name="api_mesqrcode")
+     * @Route("api/my-qrcodes", name="api_mesqrcode")
      */
     public function GetMyQrCodes(Request $request, SerializerInterface $serializer) : Response
     {
@@ -287,7 +287,7 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("api/les-promotions", name="api_list_qrcode")
+     * @Route("api/promotions", name="api_list_qrcode")
      */
     public function GetPromotions(Request $request, SerializerInterface $serializer) : Response
     {
@@ -414,31 +414,53 @@ class ApiController extends AbstractController
             return $response;
         }
 
-        try
-        {
-            $date = new \DateTime('now');
-            $timestamp =  $date->getTimestamp();
-            $allPromotions = $this->getDoctrine()->getRepository(QrCode::class)->findBy(array(), null, $numberOfQrCode, $firstId);
+        try {
 
-            $query = "SELECT id,name,description,image,date_crea AS dateCrea,date_exp AS dateExp FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
-            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
-            $connection->execute();
-            $allPromotions = $connection->fetchAll();
+            try {
+                $myIdQrCode = $requestBody['MyIdQRCodes'];
+                $date = new \DateTime('now');
+                $timestamp = $date->getTimestamp();
 
-            $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
-            $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
-            $connection->execute();
-            $nbOfQrCode = $connection->fetchAll();
+                $query = "SELECT id,id_qrcode AS idQRCode,name,description,image,date_crea AS dateCrea,date_exp AS dateExp,code_promo AS codePromo FROM qr_code WHERE date_exp > $timestamp LIMIT $firstId , $numberOfQrCode";
+                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($query);
+                $connection->execute();
+                $allPromotions = $connection->fetchAll();
+                $sizeAllPromos = sizeof($allPromotions);
 
-            $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
-            $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
+                $queryNbOfQrCode = "SELECT COUNT(*) FROM qr_code WHERE date_exp > $timestamp";
+                $connection = $this->getDoctrine()->getManager()->getConnection()->prepare($queryNbOfQrCode);
+                $connection->execute();
+                $nbOfQrCode = $connection->fetchAll();
 
-            $response = new Response($jsonContent, 200,
-                ["Content-Type" => "application/json"
+                for($i=0;$i<$sizeAllPromos;$i++)
+                {
+                    if(!in_array($allPromotions[$i]["idQRCode"],$myIdQrCode))
+                    {
+                        unset($allPromotions[$i]["idQRCode"]);
+                        unset($allPromotions[$i]["codePromo"]);
+                    }
+                }
+                /*if(in_array($allPromotions[1]["idQRCode"],$myIdQrCode))
+                {
+                    unset($allPromotions[1]["idQRCode"]);
+                }*/
 
-                ]);
 
-            return $response;
+                $array_response = array("promotions" => $allPromotions, "NbOfQrCode" => $nbOfQrCode[0]["COUNT(*)"]);
+                $jsonContent = $serializer->serialize($array_response, 'json', ['groups' => 'jsonPromotions']);
+
+                $response = new Response($jsonContent, 200,
+                    ["Content-Type" => "application/json"
+
+                    ]);
+
+                return $response;
+
+        }
+        catch(\Exception $exception)
+            {
+
+            }
 
 
 
@@ -530,86 +552,6 @@ class ApiController extends AbstractController
         //$manager->flush();
 
     }
-
-    /**
-     * @Route("/api/all-qrcode", name="api_all_qrcode")
-     */
-    public function GetAllQrCode(Request $request, SerializerInterface $serializer) : Response
-    {
-        if ($request->isMethod('post')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method POST is not allowed for /api/all-qrcode");
-
-            $json = json_encode($error_405);
-            $response = new Response($json, 405,
-                ["Content-Type" => "application/json"
-
-                ]);
-            return $response;
-        }
-
-        else if ($request->isMethod('put')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method PUT is not allowed for /api/all-qrcode");
-
-            $json = json_encode($error_405);
-            $response = new Response($json, 405,
-                ["Content-Type" => "application/json"
-
-                ]);
-            return $response;
-        }
-
-        else if ($request->isMethod('delete')) {
-            $error_405 = array("Error" => "Bad Request (405)" , "errorMessage" => "Method DELETE is not allowed for /api/all-qrcode");
-
-            $json = json_encode($error_405);
-            $response = new Response($json, 405,
-                ["Content-Type" => "application/json"
-
-                ]);
-            return $response;
-        }
-
-        $apiToken = $request->headers->get('MSPR-ApiKey');
-
-        if($apiToken == null)
-        {
-            $error_401 = array("Error" => "Unauthorized (401)" , "errorMessage" => "You need an API Key to access to this resource. Please refer to documentation for more details.");
-
-            $json = json_encode($error_401);
-            $response = new Response($json, 401,
-                ["Content-Type" => "application/json"
-
-                ]);
-            return $response;
-        }
-
-        else
-        {
-            $token = $this->getDoctrine()->getRepository(ApiKey::class)->findBy(['token' => $apiToken]);
-
-            if($token == null)
-            {
-                $error_401 = array("Error" => "Unauthorized (401)" , "errorMessage" => "Invalid API Key. Please refer to documentation for more details.");
-
-                $json = json_encode($error_401);
-                $response = new Response($json, 401,
-                    ["Content-Type" => "application/json"
-
-                    ]);
-                return $response;
-            }
-        }
-
-        $allQrCode = $this->getDoctrine()->getRepository(QrCode::class)->findAll();
-        $jsonContent = $serializer->serialize($allQrCode, 'json', ['groups' => 'jsonGetIdAndMy']);
-
-        $response = new Response($jsonContent, 200,
-            ["Content-Type" => "application/json"
-
-            ]);
-
-        return $response;
-
-    }
+    
 
 }
