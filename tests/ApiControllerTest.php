@@ -58,7 +58,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/api/qrcode?sample');
+        $client->request('post', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
@@ -67,7 +67,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('PUT', '/api/qrcode?sample');
+        $client->request('put', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
@@ -78,7 +78,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('DELETE', '/api/qrcode?sample');
+        $client->request('delete', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
