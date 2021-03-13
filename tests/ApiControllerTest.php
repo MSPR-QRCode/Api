@@ -49,15 +49,34 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
 
-
-    // public function GetPromotionsWhenApiTokenIsNull()
-    // {
-
-    // }
-
-    // public function GetPromotionsWhenApiTokenIsNotNull()
-    // {
+    /** @test */
+    public function testGetPromotionsWhenApiTokenIsNull()
+    {
+        $client = static::createClient();
         
+        $client->request(
+            'GET', '/api/promotions', [
+                'headers' => [
+                    'MSPR-ApiKey' => null,
+                ]
+            ]);
+
+        $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    }
+
+    // /** @test */
+    // public function testGetPromotionsWhenApiTokenIsNotNull()
+    // {
+    //     $client = static::createClient();
+        
+    //     $client->request(
+    //         'GET', '/api/promotions', [
+    //             'headers' => [
+    //                 'MSPR-ApiKey' => 'nAaVgDtxKrygcvzxwagUwvwFJUKwZBHuQWPSYmaAjNqmArxxfTTuaQxxkyvfjFTPmbzwHmjWmdGWejxcVNbphSvnybHEyXfcYEYp',
+    //             ]
+    //         ]);
+
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
     // }
 
     /** @test */
