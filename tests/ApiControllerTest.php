@@ -82,5 +82,4 @@ class ApiControllerTest extends WebTestCase
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
-}
-//test file
+ }
