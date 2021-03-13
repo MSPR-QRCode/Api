@@ -8,7 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiControllerTest extends WebTestCase
 {
-    public function rootTest()
+    /** @test */
+    public function testroot()
     {
        $client = static::createClient();
 
@@ -17,69 +18,76 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
 
-    public function GetPromotionsWhenClientGet()
-    {
-        $client = static::createClient();
+    // /** @test */
+    // public function testGetPromotionsWhenClientGet()
+    // {
+    //     $client = static::createClient();
 
-        $client->request('get', '/api/promotions/');
+    //     $client->request('get', '/api/promotions/');
 
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
 
-    public function GetPromotionsWhenClientPut()
-    {
-        $client = static::createClient();
+    // /** @test */
+    // public function testGetPromotionsWhenClientPut()
+    // {
+    //     $client = static::createClient();
 
-        $client->request('put', '/api/promotions/');
+    //     $client->request('put', '/api/promotions/');
 
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
 
-    public function GetPromotionsWhenClientDelete()
-    {
-        $client = static::createClient();
 
-        $client->request('delete', '/api/promotions/');
+    // /** @test */
+    // public function testGetPromotionsWhenClientDelete()
+    // {
+    //     $client = static::createClient();
 
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $client->request('delete', '/api/promotions/');
 
-    public function GetPromotionsWhenApiTokenIsNull()
-    {
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
 
-    }
 
-    public function GetPromotionsWhenApiTokenIsNotNull()
-    {
+    // public function GetPromotionsWhenApiTokenIsNull()
+    // {
+
+    // }
+
+    // public function GetPromotionsWhenApiTokenIsNotNull()
+    // {
         
-    }
+    // }
 
-    public function GetQrCodeTestPost()
-    {
-        $client = static::createClient();
+    // /** @test */
+    // public function testGetQrCodeTestPost()
+    // {
+    //     $client = static::createClient();
 
-        $client->request('post', '/api/qrcode?sample');
+    //     $client->request('post', '/api/qrcode?sample');
 
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
 
-    public function GetQrCodeTestPut()
-    {
-        $client = static::createClient();
+    // /** @test */
+    // public function testGetQrCodeTestPut()
+    // {
+    //     $client = static::createClient();
 
-        $client->request('put', '/api/qrcode?sample');
+    //     $client->request('put', '/api/qrcode?sample');
 
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
 
     
+    // /** @test */
+    // public function testGetQrCodeTestDelete()
+    // {
+    //     $client = static::createClient();
 
-    public function GetQrCodeTestDelete()
-    {
-        $client = static::createClient();
+    //     $client->request('delete', '/api/qrcode?sample');
 
-        $client->request('delete', '/api/qrcode?sample');
-
-        $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    }
+    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    // }
  }
