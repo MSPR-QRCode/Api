@@ -8,14 +8,14 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiControllerTest extends WebTestCase
 {
-    // public function rootTest()
-    // {
-    //     $client = static::createClient();
+    public function rootTest()
+    {
+       $client = static::createClient();
 
-    //     $client->request('get', '/');
+        $client->request('get', '/');
 
-    //     $this->assertEquals(405, $client->getResponse()->getStatusCode());
-    // }
+        $this->assertEquals(405, $client->getResponse()->getStatusCode());
+    }
 
     public function GetPromotionsWhenClientGet()
     {
@@ -58,7 +58,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/');
+        $client->request('post', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
@@ -67,7 +67,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('PUT', '/');
+        $client->request('put', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
@@ -78,7 +78,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('DELETE', '/');
+        $client->request('delete', '/api/qrcode?sample');
 
         $this->assertEquals(405, $client->getResponse()->getStatusCode());
     }
